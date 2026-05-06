@@ -139,7 +139,9 @@ export class GPURenderer {
 
     window.addEventListener("resize", () => {
       canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
       canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
       this.drawScreen();
     });
   }

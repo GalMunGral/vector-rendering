@@ -162,9 +162,14 @@ window.addEventListener("resize", () => {
   canvas.height = window.innerHeight * devicePixelRatio;
   canvas.style.width = window.innerWidth + "px";
   canvas.style.height = window.innerHeight + "px";
+  const fresh = new ImageData(canvas.width, canvas.height);
+  tiger.draw(fresh);
+  text1.draw(fresh);
+  text2.draw(fresh);
+  text3.draw(fresh);
 });
 
-const tiger = new Tiger(canvas.width / 2 - 100, canvas.height / 2 + 50);
+const tiger = new Tiger(canvas.width / 2, canvas.height / 2);
 
 const pangram = "The quick brown fox jumps over the lazy dog";
 const text1 = new Text(pangram, 50, 150, 60, FontBook.NotoSerif, [0, 0, 0, 1]);
