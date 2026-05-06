@@ -1,6 +1,6 @@
 # 2D Vector Path Rendering
 
-**Live demo:** https://galmungral.github.io/polyrender/compare.html
+**Live demo:** https://galmungral.github.io/vector-rendering/compare.html
 
 ## Rhetorical Design
 
