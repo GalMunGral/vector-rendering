@@ -4,28 +4,19 @@ import { Polygon } from "polyrender/Polygon";
 import { makeStroke } from "polyrender/Stroke";
 import { FontBook, makeText } from "polyrender/Text";
 
-let PIXELS_PER_FRAME = 1;
-const slider = document.createElement("input");
-slider.type = "range";
-slider.min = "1";
-slider.max = "10001";
-slider.defaultValue = "1";
-slider.onchange = () => {
-  PIXELS_PER_FRAME = parseInt(slider.value);
-};
-slider.style.position = "fixed";
-slider.style.top = "0px";
-slider.style.width = "200px";
-slider.style.right = "0px";
-slider.style.margin = "50px";
-document.body.append(slider);
+let PIXELS_PER_FRAME = 5000;
+const speedSlider = document.querySelector("#speed") as HTMLInputElement;
+const playBtn = document.querySelector("#play") as HTMLButtonElement;
+speedSlider.oninput = () => { PIXELS_PER_FRAME = parseInt(speedSlider.value); };
 
 const canvas = document.querySelector("#test") as HTMLCanvasElement;
 document.body.style.margin = "0px";
-canvas.width = window.innerWidth * devicePixelRatio;
-canvas.height = window.innerHeight * devicePixelRatio;
-canvas.style.width = window.innerWidth + "px";
-canvas.style.height = window.innerHeight + "px";
+const CANVAS_WIDTH = window.innerWidth;
+const CANVAS_HEIGHT = 900;
+canvas.width = CANVAS_WIDTH * devicePixelRatio;
+canvas.height = CANVAS_HEIGHT * devicePixelRatio;
+canvas.style.width = CANVAS_WIDTH + "px";
+canvas.style.height = CANVAS_HEIGHT + "px";
 canvas.style.background = "lightgray";
 const ctx = canvas.getContext("2d")!;
 
@@ -48,7 +39,6 @@ function drawScreen() {
 class Tiger {
   private colors: Array<[number, number, number, number]> = [];
   private polygons: Array<Polygon> = [];
-  private isDrawing = false;
 
   constructor(private x: number, private y: number) {
     this.prepare();
@@ -101,6 +91,7 @@ class Tiger {
     for (let i = 0; i < this.polygons.length; ++i) {
       const [r, g, b, a] = this.colors[i];
       this.polygons[i].traverse((x, y) => {
+        if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
         const i = (y * canvas.width + x) * 4;
         imageData.data[i] = r;
         imageData.data[i + 1] = g;
@@ -111,44 +102,15 @@ class Tiger {
     ctx.putImageData(imageData, 0, 0);
   }
 
-  public drawWithDelay(imageData: ImageData) {
-    if (this.isDrawing) return;
-    this.isDrawing = true;
-    function* pixels(that: Tiger) {
-      for (let i = 0; i < that.polygons.length; ++i) {
-        // const [r, g, b, a] = that.colors[i];
-        // if (a == 0 || (r == 255 && g == 255 && b == 255)) continue;
-        const it = that.polygons[i].traverseAsync();
-        while (true) {
-          const { done, value } = it.next();
-          if (done) break;
-          yield { color: that.colors[i], point: value };
-        }
+  public *pixels() {
+    for (let i = 0; i < this.polygons.length; ++i) {
+      const it = this.polygons[i].traverseAsync();
+      while (true) {
+        const { done, value } = it.next();
+        if (done) break;
+        yield { color: this.colors[i], point: value };
       }
     }
-    const it = pixels(this);
-    const that = this;
-    (function drawChunkOfPixels() {
-      let n = PIXELS_PER_FRAME;
-      while (n--) {
-        const { done, value } = it.next();
-        if (done) {
-          that.isDrawing = false;
-          return;
-        }
-        const {
-          color: [r, g, b, a],
-          point: { x, y },
-        } = value;
-        const i = (y * canvas.width + x) * 4;
-        imageData.data[i] = r;
-        imageData.data[i + 1] = g;
-        imageData.data[i + 2] = b;
-        imageData.data[i + 3] = a;
-      }
-      ctx.putImageData(imageData, 0, 0);
-      requestAnimationFrame(drawChunkOfPixels);
-    })();
   }
 }
 
@@ -185,6 +147,7 @@ class Text {
     const [r, g, b, a] = this.color.map((x) => Math.round(x * 255));
     for (let i = 0; i < this.polygons.length; ++i) {
       this.polygons[i].traverse((x, y) => {
+        if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
         const i = (y * canvas.width + x) * 4;
         imageData.data[i] = r;
         imageData.data[i + 1] = g;
@@ -196,46 +159,12 @@ class Text {
   }
 }
 
-const tiger = new Tiger(600, 600);
+const tiger = new Tiger(canvas.width / 2 - 100, canvas.height / 2 + 50);
 
-const text1 = new Text(
-  "Hybrid",
-  50,
-  100,
-  100,
-  FontBook.BlackOpsOne,
-  [1, 1, 1, 1],
-  () => {
-    location.href = "./index";
-    return true;
-  }
-);
-
-const text2 = new Text(
-  "GPU",
-  50,
-  200,
-  100,
-  FontBook.BlackOpsOne,
-  [1, 1, 1, 1],
-  () => {
-    location.href = "./gpu";
-    return true;
-  }
-);
-
-const text3 = new Text(
-  "CPU",
-  50,
-  300,
-  100,
-  FontBook.BlackOpsOne,
-  [1, 1, 1, 1],
-  () => {
-    location.href = "./cpu";
-    return true;
-  }
-);
+const pangram = "The quick brown fox jumps over the lazy dog";
+const text1 = new Text(pangram, 50, 150, 60, FontBook.NotoSerif, [0, 0, 0, 1]);
+const text2 = new Text(pangram.toUpperCase(), 50, 260, 40, FontBook.NotoSerif, [0, 0, 0, 1]);
+const text3 = new Text(pangram.toLowerCase(), 50, 350, 25, FontBook.NotoSerif, [0, 0, 0, 1]);
 
 const imageData = new ImageData(canvas.width, canvas.height);
 tiger.draw(imageData);
@@ -243,13 +172,67 @@ text1.draw(imageData);
 text2.draw(imageData);
 text3.draw(imageData);
 
-canvas.onclick = () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const imageData = new ImageData(canvas.width, canvas.height);
-  text1.draw(imageData);
-  text2.draw(imageData);
-  text3.draw(imageData);
-  tiger.drawWithDelay(imageData);
+type AnimState = "idle" | "playing" | "paused" | "done";
+const BUTTON_LABEL: Record<AnimState, string> = { idle: "Play", playing: "Pause", paused: "Play", done: "Restart" };
+
+let animState: AnimState = "idle";
+let pixelIter: ReturnType<typeof tiger.pixels> | null = null;
+let animData: ImageData | null = null;
+
+function syncButton() {
+  playBtn.textContent = BUTTON_LABEL[animState];
+}
+
+function drawChunk() {
+  if (animState !== "playing") return;
+  let n = PIXELS_PER_FRAME;
+  while (n--) {
+    const { done, value } = pixelIter!.next();
+    if (done) {
+      animState = "done";
+      ctx.putImageData(animData!, 0, 0);
+      syncButton();
+      return;
+    }
+    const { color: [r, g, b, a], point: { x, y } } = value;
+    if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) continue;
+    const i = (y * canvas.width + x) * 4;
+    animData!.data[i] = r;
+    animData!.data[i + 1] = g;
+    animData!.data[i + 2] = b;
+    animData!.data[i + 3] = a;
+  }
+  ctx.putImageData(animData!, 0, 0);
+  requestAnimationFrame(drawChunk);
+}
+
+function startAnimation() {
+  animState = "playing";
+  animData = new ImageData(canvas.width, canvas.height);
+  text1.draw(animData);
+  text2.draw(animData);
+  text3.draw(animData);
+  pixelIter = tiger.pixels();
+  syncButton();
+  requestAnimationFrame(drawChunk);
+}
+
+playBtn.onclick = () => {
+  switch (animState) {
+    case "idle":
+    case "done":
+      startAnimation();
+      break;
+    case "playing":
+      animState = "paused";
+      syncButton();
+      break;
+    case "paused":
+      animState = "playing";
+      syncButton();
+      requestAnimationFrame(drawChunk);
+      break;
+  }
 };
 
 function parseColor(s: string): [number, number, number, number] {

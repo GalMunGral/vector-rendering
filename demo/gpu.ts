@@ -174,30 +174,9 @@ class Text {
 const canvas = document.querySelector("#test") as HTMLCanvasElement;
 const renderer = new GPURenderer(canvas);
 
-canvas.addEventListener("click", () => {
-  debug = !debug;
-  renderer.drawScreen();
-});
+renderer.register(new Tiger(canvas.width / 2, canvas.height / 2));
 
-renderer.register(new Tiger(600, 600));
-
-renderer.register(
-  new Text("Hybrid", 50, 100, 100, FontBook.BlackOpsOne, [1, 1, 1, 1], () => {
-    location.href = "./index";
-    return true;
-  })
-);
-
-renderer.register(
-  new Text("GPU", 50, 200, 100, FontBook.BlackOpsOne, [1, 1, 1, 1], () => {
-    location.href = "./gpu";
-    return true;
-  })
-);
-
-renderer.register(
-  new Text("CPU", 50, 300, 100, FontBook.BlackOpsOne, [1, 1, 1, 1], () => {
-    location.href = "./cpu";
-    return true;
-  })
-);
+const pangram = "The quick brown fox jumps over the lazy dog";
+renderer.register(new Text(pangram, 50, 150, 60, FontBook.NotoSerif, [0, 0, 0, 1]));
+renderer.register(new Text(pangram.toUpperCase(), 50, 260, 40, FontBook.NotoSerif, [0, 0, 0, 1]));
+renderer.register(new Text(pangram.toLowerCase(), 50, 350, 25, FontBook.NotoSerif, [0, 0, 0, 1]));
