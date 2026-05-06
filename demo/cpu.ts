@@ -11,12 +11,10 @@ speedSlider.oninput = () => { PIXELS_PER_FRAME = parseInt(speedSlider.value); };
 
 const canvas = document.querySelector("#test") as HTMLCanvasElement;
 document.body.style.margin = "0px";
-const CANVAS_WIDTH = window.innerWidth;
-const CANVAS_HEIGHT = 900;
-canvas.width = CANVAS_WIDTH * devicePixelRatio;
-canvas.height = CANVAS_HEIGHT * devicePixelRatio;
-canvas.style.width = CANVAS_WIDTH + "px";
-canvas.style.height = CANVAS_HEIGHT + "px";
+canvas.width = window.innerWidth * devicePixelRatio;
+canvas.height = window.innerHeight * devicePixelRatio;
+canvas.style.width = window.innerWidth + "px";
+canvas.style.height = window.innerHeight + "px";
 canvas.style.background = "lightgray";
 const ctx = canvas.getContext("2d")!;
 
@@ -158,6 +156,13 @@ class Text {
     ctx.putImageData(imageData, 0, 0);
   }
 }
+
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth * devicePixelRatio;
+  canvas.height = window.innerHeight * devicePixelRatio;
+  canvas.style.width = window.innerWidth + "px";
+  canvas.style.height = window.innerHeight + "px";
+});
 
 const tiger = new Tiger(canvas.width / 2 - 100, canvas.height / 2 + 50);
 

@@ -30,12 +30,11 @@ export class GPURenderer {
 
   constructor(canvas: HTMLCanvasElement) {
     document.body.style.margin = "0px";
-    document.body.style.overflowY = "auto";
     canvas.style.display = "block";
     canvas.width = window.innerWidth * devicePixelRatio;
-    canvas.height = 900 * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
     canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = "900px";
+    canvas.style.height = window.innerHeight + "px";
     canvas.style.background = "lightgray";
 
     this.gl = canvas.getContext("webgl2")!;
