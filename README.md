@@ -1,4 +1,4 @@
-# Polygon Renderer
+# 2D Vector Path Rendering
 
 **Live demo:** https://galmungral.github.io/polyrender/compare.html
 
