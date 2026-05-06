@@ -3,6 +3,7 @@ import path from "path";
 
 export default defineConfig({
   root: "demo",
+  base: "/vector-rendering/",
   resolve: {
     alias: {
       polyrender: path.resolve(__dirname, "src"),
