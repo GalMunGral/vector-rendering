@@ -14,7 +14,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        compare: path.resolve(__dirname, "demo/assets/compare.html"),
+        index: path.resolve(__dirname, "demo/index.html"),
         hybrid: path.resolve(__dirname, "demo/assets/hybrid.html"),
         gpu: path.resolve(__dirname, "demo/assets/gpu.html"),
         cpu: path.resolve(__dirname, "demo/assets/cpu.html"),
