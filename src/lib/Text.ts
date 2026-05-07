@@ -2,7 +2,7 @@ import { Font, parse } from "opentype.js";
 import { CyclicList } from "polyrender/CyclicList.js";
 import { Polygon } from "polyrender/Polygon.js";
 import { Vector } from "polyrender/Vector";
-import { sampleBezier } from "../src/Bezier.js";
+import { sampleBezier } from "./Bezier.js";
 
 export const FontBook = {
   NotoSans: parse(await (await fetch("./NotoSans.ttf")).arrayBuffer()),
